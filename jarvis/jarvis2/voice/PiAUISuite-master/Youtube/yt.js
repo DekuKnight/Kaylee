@@ -1,0 +1,73 @@
+// YouTube  Launcher
+// Steven Hickson
+// 2013-06-07
+// Copyright (c) 2013
+// Released under the GPL license
+// http://www.gnu.org/copyleft/gpl.html
+// Modified version of BlockFlash2 by varanasi,Andrew Pennebaker,Jos van den Oever
+// Modified to work with omxplayer and not use flash at all
+// --------------------------------------------------------------------
+//
+// ==UserScript==
+// @name			YouTube Launcher
+// @namespace		None
+// @description		Plays youtube videos with omxplayer
+// @include			http*://youtube.com/*
+// @include			http*://*.youtube.com/*
+// @include			http*://youtube-nocookie.com/*
+// @include			http*://*.youtube-nocookie.com/*
+//
+// ==/UserScript==
+
+xpath("//embed").forEach(function(embed) {            // put all embed objects in array and check each
+    if (embed.parentNode.nodeName != "OBJECT" && embed.parentNode.style.display != "none"){       // handle embeds within objects as objects
+	if(checkforflash(embed)){add_play_flash_div(embed)};
+   };
+});
+
+xpath("//object").forEach(function(object) {     
+    if(checkforflash(object)){add_play_flash_div(object)};
+});
+
+function checkforflash(potl_item){                    // checks the element passed to it for Flash content
+    if (potl_item.hasAttribute("flashvars") ){
+	return true
+    };
+    if (potl_item.hasAttribute("type") && potl_item.getAttribute("type").match(/flash|shockwave/)){
+	return true
+    };
+    if (potl_item.hasAttribute("src") && potl_item.getAttribute("src").match(/.swf|shockwave|flash|eyewonder/)){
+	return true
+    };
+    if (potl_item.innerHTML.match(/.swf|shockwave|flash|eyewonder/)) {
+	return true
+    };
+    return false;
+};
+
+function add_play_flash_div(flash){            // places the button-like div before the flash node
+    var placeholder=document.createElement("a");
+    savedDisplay = flash.style.display;
+    placeholder.setAttribute("class", "ReplaceVideo");
+    flash.parentNode.insertBefore(placeholder, flash);  
+    flash.style.display='none';               
+    flash.on=false;
+    flash.remove();
+    placeholder.style.cursor='pointer';
+    placeholder.style.background='green';  
+    placeholder.style.textAlign='center';
+    placeholder.style.textTransform='capitalize';
+    placeholder.style.color='black';
+    placeholder.innerHTML="[Play Video]";
+    var tmp=document.location.href;
+    tmp=tmp.replace("https","yt");
+    placeholder.href=tmp.replace("http","yt");
+    return true;
+}
+
+function xpath (p, context) {
+    if (!context) context = document;
+    var i, arr = [], xpr = document.evaluate(p, context, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
+    for (i = 0; item = xpr.snapshotItem(i); i++) arr.push(item);
+    return arr;
+};
