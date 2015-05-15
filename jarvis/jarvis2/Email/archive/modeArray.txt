@@ -1,5 +1,0 @@
-modeArray
-0 - verbose
-1 - parrot
-2 - rageParrot
-3 - quiet
