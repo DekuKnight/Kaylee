@@ -1,2 +1,2 @@
 Kaylee Project
-Room Automation system/Companion
+Home Automation System
